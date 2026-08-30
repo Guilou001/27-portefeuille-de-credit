@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+title: "La règle de capital de crédit du BSIF sur un portefeuille fini : ce qu'elle manque, et ce que l'ajustement de granularité rattrape"
+message: "Si vous utilisez ce dépôt, citez-le comme suit."
+type: software
+authors:
+  - family-names: Vaudescal
+    given-names: Guillaume
+repository-code: "https://github.com/Guilou001/27-portefeuille-de-credit"
+license: MIT
+version: 1.0.0
+date-released: "2026-08-30"

@@ -9,7 +9,7 @@ granulaire.
 infinité. Le hasard propre à chaque emprunteur ne s'annule donc pas, et il ajoute du risque que la
 formule ne compte pas. Ce risque en plus s'appelle le **risque de concentration**.
 
-Ce module le mesure. Il tire des dizaines de milliers d'années possibles, chacune avec sa conjoncture
+Ce module le mesure. Il tire cinq millions d'années possibles, chacune avec sa conjoncture
 et ses défauts individuels, et regarde la perte de la millième pire année. Cette perte-là est le vrai
 capital nécessaire. La différence avec la formule est ce que le régulateur ne compte pas.
 """
@@ -19,9 +19,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import numpy as np
-from scipy.stats import norm
+from scipy.stats import binom, norm
 
 from .bale import CONFIANCE, capital_unitaire, correlation_entreprise
+
+GRAINES = tuple(range(1, 11))   # les dix tirages indépendants sur lesquels le tableau est mesuré
 
 
 @dataclass(frozen=True)
@@ -102,10 +104,9 @@ def _groupes(portefeuille: Portefeuille):
     """Les prêts rassemblés par couple identique de montant et de probabilité de défaut.
 
     C'est ce qui rend la simulation rapide. Une fois la conjoncture fixée, les emprunteurs font
-    défaut indépendamment les uns des autres : le nombre de défauts dans un groupe de prêts
+    défaut indépendamment les uns des autres. Le nombre de défauts dans un groupe de prêts
     identiques suit donc une loi binomiale, et il se tire d'un coup au lieu d'être tiré prêt par
-    prêt. Sur un portefeuille de mille prêts en deux groupes, cela remplace mille tirages par deux,
-    ce qui permet de passer de deux cent mille années simulées à cinq millions.
+    prêt. Sur un portefeuille de mille prêts en deux groupes, cela remplace mille tirages par deux.
     """
     cles = {}
     for montant, pd_defaut in zip(portefeuille.montants, portefeuille.pd_defaut, strict=True):
@@ -116,7 +117,7 @@ def _groupes(portefeuille: Portefeuille):
     return montants, pds, effectifs
 
 
-def simuler(portefeuille: Portefeuille, tirages: int = 5_000_000, graine: int = 30) -> dict:
+def simuler(portefeuille: Portefeuille, tirages: int = 5_000_000, graine: int = 1) -> dict:
     """La perte du portefeuille sur des millions d'années possibles.
 
     Chaque année tirée a d'abord sa conjoncture, commune à tous les emprunteurs. Sachant cette
@@ -152,22 +153,40 @@ def simuler(portefeuille: Portefeuille, tirages: int = 5_000_000, graine: int = 
 def erreur_type_du_quantile(pertes: np.ndarray, niveau: float = CONFIANCE) -> float:
     """De combien le quantile simulé peut se tromper, faute d'avoir tiré assez d'années.
 
-    Sans ce nombre, un écart entre la simulation et la formule ne prouve rien : il pourrait n'être
-    que du bruit de tirage. La formule est celle de l'erreur type d'un quantile empirique.
+    Le calcul passe par les rangs et non par une densité. Sur les pertes triées, le rang qui porte le
+    quantile est aléatoire, et il suit une loi binomiale de paramètres le nombre de tirages et le
+    niveau. Cette loi est exacte quelle que soit la loi des pertes. On lit donc les deux pertes triées
+    dont les rangs bornent cette binomiale à 95 %, et la demi-largeur de leur intervalle, divisée par
+    1,96, est l'erreur type cherchée.
+
+    Cette voie évite l'estimation d'une densité, qui n'existe pas ici : la perte d'un portefeuille de
+    prêts égaux ne prend qu'un nombre fini de valeurs. C'est aussi sa limite. Quand ces valeurs sont
+    espacées, les deux rangs tombent sur la même, et la fonction rend zéro alors que le quantile
+    saute encore d'une valeur à l'autre d'un tirage à l'autre. L'incertitude publiée dans
+    `results/capital_par_taille.csv` est donc celle de `dispersion_du_capital`, mesurée sur dix
+    tirages, et cette formule-ci ne sert qu'à la contrôler sur les portefeuilles fins.
     """
     n = len(pertes)
-    densite = _densite_au_quantile(pertes, niveau)
-    if densite <= 0.0:
-        return float("nan")
-    return float(np.sqrt(niveau * (1.0 - niveau) / n) / densite)
-
-
-def _densite_au_quantile(pertes: np.ndarray, niveau: float) -> float:
-    """La densité des pertes au voisinage du quantile, estimée par la pente locale."""
-    n = len(pertes)
     tries = np.sort(pertes)
-    position = int(niveau * n)
-    fenetre = max(50, int(0.002 * n))
-    bas, haut = max(0, position - fenetre), min(n - 1, position + fenetre)
-    largeur = tries[haut] - tries[bas]
-    return (haut - bas) / n / largeur if largeur > 0 else 0.0
+    bas = int(np.clip(binom.ppf(0.025, n, niveau), 0, n - 1))
+    haut = int(np.clip(binom.ppf(0.975, n, niveau), 0, n - 1))
+    return float((tries[haut] - tries[bas]) / (2.0 * norm.ppf(0.975)))
+
+
+def dispersion_du_capital(portefeuille: Portefeuille, graines=GRAINES,
+                          tirages: int = 5_000_000) -> dict:
+    """Le capital simulé, mesuré sur plusieurs tirages indépendants plutôt que sur un seul.
+
+    Un tirage unique donne un nombre dont on ignore la précision, et rien n'interdit qu'il soit le
+    plus haut ou le plus bas de ceux qu'on aurait obtenus. La moyenne de plusieurs tirages est
+    publiée à la place, et leur dispersion donne l'incertitude, mesurée et non calculée. L'erreur
+    type rendue est celle de cette moyenne, donc la dispersion divisée par la racine du nombre de
+    tirages.
+    """
+    valeurs = np.array([simuler(portefeuille, tirages=tirages, graine=g)["capital_simule"]
+                        for g in graines])
+    ecart_type = float(valeurs.std(ddof=1))
+    return {"capital_simule": float(valeurs.mean()),
+            "ecart_type_entre_graines": ecart_type,
+            "erreur_type": ecart_type / float(np.sqrt(len(valeurs))),
+            "valeurs": valeurs}

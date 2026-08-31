@@ -83,9 +83,11 @@ def concentration():
     table = table_par_taille()
     _ecrire(table, "capital_par_taille.csv")
     for _, ligne in table.iterrows():
+        part = (f"{ligne['part_rattrapee_pct']:5.0f} %" if ligne["part_rattrapee_publiable"]
+                else "  bruit")
         typer.echo(f"{ligne['portefeuille']:26s} règle {100*ligne['capital_regle']:.3f} %  "
                    f"vrai {100*ligne['capital_simule']:.3f} %  manque "
-                   f"{ligne['ecart_pct']:5.1f} %  rattrapé {ligne['part_rattrapee_pct']:5.0f} %")
+                   f"{ligne['ecart_pct']:5.1f} %  rattrapé {part}")
 
 
 @app.command()

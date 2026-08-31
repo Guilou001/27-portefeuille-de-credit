@@ -1,6 +1,6 @@
 """Les 144 poids de risque publiés par le BSIF, et les deux endroits où son document se contredit.
 
-Le chapitre 5 de la ligne directrice sur les normes de fonds propres se termine par une annexe qui
+Le chapitre 5 de la ligne directrice sur les normes de fonds propres se termine par une annexe. Elle
 donne, pour dix-huit niveaux de probabilité de défaut et huit types de prêts, le poids de risque que
 la formule doit produire. C'est le point de repère du dépôt : un code qui retrouve ces 144 cases
 applique bien la règle canadienne.

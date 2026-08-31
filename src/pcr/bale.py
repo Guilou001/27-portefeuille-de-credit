@@ -11,7 +11,7 @@ la banque subirait dans une conjoncture si mauvaise qu'elle n'arrive qu'une ann�
 
 **Trois nombres suffisent pour un prêt.** La probabilité qu'il ne soit pas remboursé, la part du
 montant qui serait perdue en cas de non-remboursement, et sa sensibilité à la conjoncture. Le
-troisième n'est pas estimé par la banque : le régulateur l'impose, et il le fait baisser quand la
+troisième n'est pas estimé par la banque : le régulateur l'impose. Il le fait baisser quand la
 probabilité de défaut monte, parce qu'une entreprise déjà fragile dépend plus de ses propres
 difficultés que de la conjoncture générale.
 
@@ -30,9 +30,11 @@ CONFIANCE = 0.999      # une année sur mille, le niveau imposé par la règle
 def _part_faible_correlation(pd_defaut, vitesse: float) -> np.ndarray:
     """Le poids qui fait glisser la sensibilité de sa valeur haute vers sa valeur basse.
 
-    Il vaut un quand la probabilité de défaut tend vers zéro et zéro quand elle est grande, avec une
-    vitesse de bascule que le régulateur fixe : cinquante pour les entreprises, trente-cinq pour la
-    clientèle de détail.
+    Il vaut zéro quand la probabilité de défaut tend vers zéro, et il tend vers un quand elle
+    devient grande. C'est ce poids qui porte la valeur basse, donc la sensibilité part de 24 % pour
+    les emprunteurs sûrs et descend vers 12 % pour les plus fragiles. La vitesse de bascule est
+    fixée par le régulateur : cinquante pour les entreprises, trente-cinq pour la clientèle de
+    détail.
     """
     pd_defaut = np.asarray(pd_defaut, dtype=float)
     return (1.0 - np.exp(-vitesse * pd_defaut)) / (1.0 - np.exp(-vitesse))

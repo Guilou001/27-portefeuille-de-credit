@@ -49,7 +49,7 @@ def _conditionnelles(portefeuille: Portefeuille, mauvaise_conjoncture):
 def ajustement(portefeuille: Portefeuille, niveau: float = CONFIANCE, pas: float = PAS) -> dict:
     """Le supplément de capital dû au nombre fini de prêts, et ses trois pièces.
 
-    Les dérivées sont prises numériquement par différences centrées : la formule analytique existe,
+    Les dérivées sont prises numériquement par différences centrées. La formule analytique existe,
     mais elle change dès qu'on modifie la façon dont la sensibilité dépend de la probabilité de
     défaut, alors que la dérivée numérique reste juste dans tous les cas.
     """

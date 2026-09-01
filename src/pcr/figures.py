@@ -13,7 +13,7 @@ from .reference import COLONNES, POIDS_BSIF, PROBABILITES, ecarts
 from .simulation import capital_asymptotique, concentre, dispersion_du_capital, homogene, simuler
 
 DEST = Path("results/figures")
-ECHEANCE_ANNEXE = 2.5          # l'échéance que l'annexe du BSIF retient pour ses 144 cases
+ECHEANCE_ANNEXE = 2.5          # l'échéance que l'annexe du BSIF retient pour ses colonnes d'entreprise
 SEUIL_INCERTITUDE_PART = 5.0   # points : au-delà, la part rattrapée n'est plus lisible
 PAS_HISTOGRAMME = 0.2          # points de perte : le pas des valeurs du portefeuille le plus grossier
 

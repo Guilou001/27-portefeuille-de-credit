@@ -41,9 +41,9 @@
 
 Une banque doit garder de l'argent de côté pour le jour où ses emprunteurs ne remboursent pas. La règle canadienne calcule cette somme avec une formule qui suppose que la banque prête à une infinité de tout petits clients. Une banque commerciale, elle, a quelques centaines de dossiers, dont une poignée de très gros. Ce dépôt mesure ce que l'hypothèse coûte.
 
-*Résultat en une phrase.* Sur un portefeuille de 500 prêts dont dix clients font la moitié du montant, la règle exige *5,21 %* de capital alors qu'il en faudrait *7,05 %*, donc *35 % de plus que ce qu'elle demande*. Un terme correctif que le comité de Bâle avait proposé en 2001 puis retiré rattrape *83 à 92 %* de ce manque, sans aucune simulation. Ce 5,21 % est la formule prise sans son ajustement d'échéance, et la section 3.3 chiffre ce que l'ajouter changerait.
+*Résultat en une phrase.* Sur un portefeuille de 500 prêts dont dix clients font la moitié du montant, la règle exige *5,21 %* de capital alors qu'il en faudrait *7,05 %*, donc *35 % de plus que ce qu'elle demande*. Un terme correctif que le comité de Bâle avait proposé en 2001 puis retiré en rattrape *91 %* sur ce portefeuille, sans aucune simulation. Il en rattrape *83 à 92 %* sur les cinq portefeuilles où cette part est mesurable. Ce 5,21 % est la formule prise sans son ajustement d'échéance, et la section 3.3 chiffre ce que l'ajouter changerait.
 
-_Summary in English. The Basel/OSFI IRB capital formula assumes an infinitely granular portfolio. This repository reproduces 143 of the 144 published illustrative risk weights to within one hundredth of a percentage point. It shows the 144th to be a transcription error by OSFI against the Basel source. It then measures by simulation how much capital the formula misses on finite portfolios: a book of 500 loans where ten clients hold half the exposure needs 35 % more capital than the rule demands, on the formula taken without its maturity adjustment. With that adjustment the same shortfall is 7.4 %, and both figures are published. The granularity adjustment recovers 83 to 92 % of the shortfall._
+_Summary in English. The Basel/OSFI IRB capital formula assumes an infinitely granular portfolio. This repository reproduces 143 of the 144 published illustrative risk weights to within one hundredth of a percentage point. It shows the 144th to be a transcription error by OSFI against the Basel source. It then measures by simulation how much capital the formula misses on finite portfolios: a book of 500 loans where ten clients hold half the exposure needs 35 % more capital than the rule demands, on the formula taken without its maturity adjustment. With that adjustment the same shortfall is 7.4 %, and both figures are published. The granularity adjustment recovers 91 % of that shortfall on this portfolio, and 83 to 92 % across the five portfolios where that share is measurable._
 
 == 1. La question posée
 
@@ -79,7 +79,7 @@ L'annexe 5-1 du chapitre 5 donne, pour dix-huit niveaux de risque et huit types 
 
 #figure(image("../results/figures/courbes_reglementaires.png", width: 100%), caption: [Les quatre courbes de la règle, et les points publiés])
 
-Comment lire cette figure : chaque courbe est une famille de prêts, calculée par notre code sur quatre cents niveaux de risque. L'axe vertical porte le poids de risque, qui vaut douze fois et demie le capital exigé, et non le capital lui-même. Les points sont les valeurs publiées par le BSIF, et 71 des 72 tombent sur les courbes. Le soixante-douzième est une coquille, un chiffre mal recopié d'un document à l'autre. Il passe trois points au-dessus de sa courbe, sur un axe qui en porte 260, donc l'œil ne l'en sépare pas. La carte de la figure suivante le montre, et la section 3.2 l'établit.
+Comment lire cette figure : chaque courbe est une famille de prêts, calculée par notre code sur quatre cents niveaux de risque. L'axe vertical porte le poids de risque, qui vaut douze fois et demie le capital exigé, et non le capital lui-même. Les points sont les valeurs publiées par le BSIF, et 71 des 72 tombent sur les courbes. Le soixante-douzième est une coquille, un chiffre mal recopié d'un document à l'autre. Il passe trois points au-dessus de sa courbe, sur un axe qui en porte 286, donc l'œil ne l'en sépare pas. La carte de la figure suivante le montre, et la section 3.2 l'établit.
 
 #figure(image("../results/figures/verification_annexe.png", width: 100%), caption: [Les 144 cases, écart au chiffre imprimé])
 
@@ -181,11 +181,11 @@ Tous les prêts ont ici le même risque, un pour cent de non-remboursement par a
 
 La colonne « Manque » rapporte l'écart à ce que la règle exige, et non à ce qu'il faudrait : 35,3 % veut dire qu'il faudrait 35,3 % de plus que les 5,21 % demandés.
 
-Trois constats se lisent ensuite. Le premier est la colonne du *nombre équivalent* : elle mesure la concentration, et se lit comme le nombre de prêts égaux qui donnerait le même risque. Cinq cents prêts dont dix font la moitié du montant se comportent comme trente-neuf prêts égaux, et c'est pour cela que leur manque de capital est le plus grand du tableau. Le deuxième est que le manque disparaît quand les prêts sont très nombreux, ce qui confirme que la formule est bien la limite d'un portefeuille infini et non une approximation de plus. Le troisième est que la dernière colonne se tait sur les quatre premières lignes. Leur manque y est si petit que la part rattrapée flotte de plus de cinq points d'un tirage à l'autre, et un nombre qu'on ne sait pas à cinq points près n'apprend rien. Ce seuil de cinq points est le seul critère de la colonne, et le fichier chiffre l'incertitude ligne à ligne.
+Trois constats se lisent ensuite. Le premier est la colonne du *nombre équivalent* : elle mesure la concentration, et se lit comme le nombre de prêts égaux qui donnerait le même risque. Cinq cents prêts dont dix font la moitié du montant se comportent comme trente-neuf prêts égaux, et c'est pour cela que leur manque de capital est le plus grand du tableau. Le deuxième est que le manque disparaît quand les prêts sont très nombreux, ce qui confirme que la formule est bien la limite d'un portefeuille infini et non une approximation de plus. Le troisième est que la dernière colonne se tait sur les quatre premières lignes. Leur manque y est si petit que la part rattrapée n'est pas connue à cinq points près, même en moyennant dix tirages, et un tel nombre n'apprend rien. Ce seuil de cinq points est le seul critère de la colonne, et le fichier chiffre l'incertitude ligne à ligne.
 
-Le tableau n'établit rien au-delà. Tous les prêts y portent le même risque et la même perte en cas de défaut. Chaque valeur simulée est la moyenne de dix tirages de cinq millions d'années, et leur dispersion donne l'incertitude publiée.
+Le tableau n'établit rien au-delà. Tous les prêts y portent le même risque et la même perte en cas de défaut. Chaque valeur simulée est la moyenne de dix tirages de cinq millions d'années, et leur dispersion, divisée par la racine de dix, donne l'incertitude publiée.
 
-*Ce que « la règle » désigne ici, et ce que l'autre convention donnerait.* Les 144 cases de la section 3.1 sont produites avec un ajustement d'échéance de deux ans et demi, celui que l'annexe du BSIF retient. Le tableau ci-dessus le retire, parce qu'il couvre la dégradation de note, un risque que la simulation ne modélise pas. Sur le même prêt, les deux exigences diffèrent : 5,21 % sans l'ajustement, 6,56 % avec. Le manque de la dernière ligne se lit donc de deux façons, 35,3 % de plus que 5,21 %, ou 7,4 % de plus que 6,56 %. Le signe lui-même peut changer : sur « 500 prêts, dix font 30 % », il en faudrait 9,7 % de moins que ce que la règle avec échéance demande. Les deux colonnes sont dans #raw("results/capital_par_taille.csv").
+*Ce que « la règle » désigne ici, et ce que l'autre convention donnerait.* L'annexe du BSIF retient un ajustement d'échéance de deux ans et demi pour ses deux colonnes d'entreprise. Les six autres n'en portent aucun, la règle n'en prévoyant pas pour l'habitation ni pour le détail. Le tableau ci-dessus retire cet ajustement, parce qu'il couvre la dégradation de note, un risque que la simulation ne modélise pas. Sur le même prêt, les deux exigences diffèrent : 5,21 % sans l'ajustement, 6,56 % avec. Le manque de la dernière ligne se lit donc de deux façons, 35,3 % de plus que 5,21 %, ou 7,4 % de plus que 6,56 %. Le signe lui-même peut changer : sur « 500 prêts, dix font 30 % », il en faudrait 9,7 % de moins que ce que la règle avec échéance demande. Les deux colonnes sont dans #raw("results/capital_par_taille.csv").
 
 #figure(image("../results/figures/capital_par_taille.png", width: 100%), caption: [Le capital selon le nombre de prêts])
 
@@ -193,7 +193,7 @@ Comment lire cette figure : la ligne bleue horizontale est ce que la règle exig
 
 #figure(image("../results/figures/rattrapage.png", width: 100%), caption: [La part de l'écart que le correctif rattrape])
 
-Comment lire cette figure : chaque barre est un portefeuille, et sa longueur est la part du manque que le correctif comble. Les quatre portefeuilles les plus gros sont retirés, parce que sur eux l'incertitude de simulation laisse cette part flotter de plus de cinq points.
+Comment lire cette figure : chaque barre est un portefeuille, et sa longueur est la part du manque que le correctif comble. Les quatre portefeuilles les plus gros sont retirés, parce que sur eux cette part n'est pas connue à cinq points près.
 
 #figure(image("../results/figures/distributions.png", width: 100%), caption: [La perte de l'année, sur cinq millions d'années simulées])
 
@@ -211,7 +211,7 @@ Comment lire cette figure : trois portefeuilles de même qualité moyenne. Les t
 
 #raw("uv sync --locked --all-extras\nuv run pytest                 # 20 tests fermés, sans réseau\nuv run pcr tout               # les trois calculs et les cinq figures, environ trente-cinq secondes", block: true, lang: "bash")
 
-Aucun téléchargement n'est nécessaire. Chaque résultat cité dans ce README se lit dans un fichier de #raw("results/"). Trois nombres font exception, et aucun n'est un résultat. Le compte de tests est celui que rend #raw("pytest"), la durée ci-dessus est relevée à l'exécution, et les quatre cents niveaux de risque de la première figure sont un réglage du code.
+Aucun téléchargement n'est nécessaire. Chaque résultat cité dans ce README se lit dans un fichier de #raw("results/"). Les seules exceptions sont des réglages du code et des relevés d'exécution, jamais un résultat. Le compte de tests est celui que rend #raw("pytest"), la durée ci-dessus est relevée à l'exécution, et les quatre cents niveaux de risque de la première figure sont un réglage du code.
 
 == 6. Limites, avec leur statut
 
@@ -231,7 +231,7 @@ Aucun téléchargement n'est nécessaire. Chaque résultat cité dans ce README 
     [Les 144 cases du BSIF sont recopiées à la main dans le code],
     [déclaré ; elles sont vérifiées contre la table de Bâle, qui est la source du BSIF],
     [L'incertitude de la simulation est mesurée sur dix tirages, et non calculée depuis une formule],
-    [mesuré ; elle va de 0,006 à 0,040 point de capital selon la ligne, et tombe à zéro sur cinquante prêts, dont la perte ne peut valoir que des multiples de 0,8 point],
+    [mesuré ; c'est leur dispersion divisée par la racine de dix, elle va de 0,006 à 0,040 point de capital selon la ligne, et tombe à zéro sur cinquante prêts, dont la perte ne peut valoir que des multiples de 0,8 point],
     [La part rattrapée n'est publiée que sur cinq des neuf lignes],
     [déclaré ; sur les quatre autres l'incertitude de cette part dépasse cinq points de pourcentage, et la colonne #raw("incertitude_part_pct") du fichier la chiffre],
     [Le correctif est implémenté par dérivées numériques et non par sa forme analytique],

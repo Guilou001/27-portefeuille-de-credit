@@ -1,20 +1,21 @@
-# La règle de capital du BSIF suppose une infinité de prêts : ce que cela coûte
+# Une règle de capital conçue pour une infinité de prêts protège-t-elle une petite banque ?
 
-Une banque doit garder de l'argent de côté pour le jour où ses emprunteurs ne remboursent pas. La
-règle canadienne calcule cette somme avec une formule qui suppose que la banque prête à une infinité
-de tout petits clients. Une banque commerciale, elle, a quelques centaines de dossiers, dont une
-poignée de très gros. Ce dépôt mesure ce que l'hypothèse coûte.
+Une banque doit garder du capital pour absorber les défauts de ses emprunteurs. La formule réglementaire suppose que le portefeuille contient une infinité de très petits prêts, ce qui fait disparaître le risque propre à chaque client. Une banque commerciale détient plutôt quelques centaines de dossiers, dont certains représentent une grande part du montant total.
+
+Le présent projet mesure l'écart créé par cette hypothèse. Il reproduit d'abord les poids de risque publiés par le BSIF, puis simule cinq millions d'années de pertes sur des portefeuilles dont la concentration varie.
+
+**Résultat principal.** La formule retrouve 143 des 144 poids de risque de l'annexe du BSIF, tandis que la dernière cellule contient une erreur de transcription confirmée par le texte de Bâle. Pour un portefeuille de 500 prêts dont dix clients représentent la moitié du montant, la règle demande 5,21 % de capital, contre une perte extrême de 7,05 %. Il faudrait donc 35 % de capital supplémentaire dans cette lecture. Un ajustement proposé par Bâle en 2001 récupère 91 % de l'écart pour ce portefeuille et entre 83 % et 92 % pour les cas comparables.
+
+Afin d'expliquer ce résultat, nous présenterons d'abord la formule réglementaire et son hypothèse de diversification. Dans un deuxième temps, nous reproduirons les 144 poids publiés et nous examinerons la cellule contradictoire. Ensuite, nous construirons les portefeuilles concentrés et nous simulerons leurs pertes. Enfin, nous mesurerons l'effet de l'ajustement de granularité, de l'échéance et des limites du modèle.
 
 [![ci](https://github.com/Guilou001/27-portefeuille-de-credit/actions/workflows/ci.yml/badge.svg)](https://github.com/Guilou001/27-portefeuille-de-credit/actions/workflows/ci.yml)
 ![python](https://img.shields.io/badge/python-3.12-blue)
 ![licence](https://img.shields.io/badge/code-MIT-green)
 
-**Résultat en une phrase.** Sur un portefeuille de 500 prêts dont dix clients font la moitié du
-montant, la règle exige **5,21 %** de capital alors qu'il en faudrait **7,05 %**, donc **35 % de
-plus que ce qu'elle demande**. Un terme correctif que le comité de Bâle avait proposé en 2001 puis
-retiré en rattrape **91 %** sur ce portefeuille, sans aucune simulation. Il en rattrape **83 à
-92 %** sur les cinq portefeuilles où cette part est mesurable. Ce 5,21 % est la formule prise sans
-son ajustement d'échéance, et la section 3.3 chiffre ce que l'ajouter changerait.
+Le rapport détaillé est disponible en PDF : [rapport/rapport.pdf](rapport/rapport.pdf).
+
+<details>
+<summary>Résumé en anglais</summary>
 
 *Summary in English. The Basel/OSFI IRB capital formula assumes an infinitely granular portfolio.
 This repository reproduces 143 of the 144 published illustrative risk weights to within one
@@ -26,7 +27,8 @@ the same shortfall is 7.4 %, and both figures are published. The granularity adj
 91 % of that shortfall on this portfolio, and 83 to 92 % across the five portfolios where that
 share is measurable.*
 
-## 1. La question posée
+</details>
+## 1. La question en détail
 
 **En mots simples.** Imaginez deux banques qui prêtent le même montant total à des clients de même
 qualité. La première a dix mille petits prêts, la seconde en a cinquante gros. Si l'économie va mal,
